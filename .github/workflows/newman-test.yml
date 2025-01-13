@@ -1,0 +1,42 @@
+name: Run Postman Tests with Newman
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  run-postman-collection:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Step 1: Checkout the repository
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    # Step 2: Set up Node.js environment
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '16'
+
+    # Step 3: Install Newman and htmlextra Reporter
+    - name: Install Newman
+      run: npm install -g newman newman-reporter-htmlextra
+
+    # Step 4: Run Newman Collection
+    - name: Run Postman Collection
+      run: |
+        newman run "RestfulBooker.postman_collection.json" \
+          --environment RestfulBooker.postman_environment.json \
+          --reporters cli,htmlextra \
+          --reporter-htmlextra-export reports/htmlextra-report.html
+
+    # Step 5: Upload HTML Report
+    - name: Upload HTML Report
+      uses: actions/upload-artifact@v3
+      with:
+        name: newman-report
+        path: reports/newman-report.html
+       
