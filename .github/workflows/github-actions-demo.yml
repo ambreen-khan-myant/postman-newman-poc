@@ -21,17 +21,17 @@ jobs:
       with:
         node-version: '16'
 
-    # Step 3: Install Newman
+    # Step 3: Install Newman and htmlextra Reporter
     - name: Install Newman
-      run: npm install -g newman newman-reporter-html
+      run: npm install -g newman newman-reporter-htmlextra
 
     # Step 4: Run Newman Collection
     - name: Run Postman Collection
       run: |
         newman run "RestfulBooker.postman_collection.json" \
           --environment RestfulBooker.postman_environment.json \
-          --reporters cli,html \
-          --reporter-html-export reports/newman-report.html
+          --reporters cli,htmlextra \
+          --reporter-htmlextra-export reports/htmlextra-report.html
 
     # Step 5: Upload HTML Report (Optional)
     - name: Upload HTML Report
