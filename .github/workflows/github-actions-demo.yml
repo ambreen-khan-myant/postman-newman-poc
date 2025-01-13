@@ -1,14 +1,42 @@
-name: "Newman Tests"
-on: [push, pull_request]
+name: Run Postman Tests with Newman
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
 
 jobs:
-  build:
+  run-postman-collection:
     runs-on: ubuntu-latest
-    container: 
-      image: postman/newman
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
 
-      - name: Run API Tests
-        run: newman run "RestfulBooker.postman_collection.json" -e RestfulBooker.postman_environment.json
+    steps:
+    # Step 1: Checkout the repository
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    # Step 2: Set up Node.js environment
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '16'
+
+    # Step 3: Install Newman
+    - name: Install Newman
+      run: npm install -g newman newman-reporter-html
+
+    # Step 4: Run Newman Collection
+    - name: Run Postman Collection
+      run: |
+        newman run "RestfulBooker.postman_collection.json" \
+          --environment RestfulBooker.postman_environment.json \
+          --reporters cli,html \
+          --reporter-html-export reports/newman-report.html
+
+    # Step 5: Upload HTML Report (Optional)
+    - name: Upload HTML Report
+      uses: actions/upload-artifact@v3
+      with:
+        name: newman-report
+        path: reports/newman-report.html
+       
